@@ -1,0 +1,80 @@
+Esquema de Cenario: Validar compra a vista
+
+Dado que seleciono a opção Debito
+E informo os dados do cartao “<numero_cartao>”, “<nome_titular>”, “<data_vencimento>”, “<cod_seguranca>”
+Quando clicar em Finalizar Compra
+Entao o sistema informa mensagem “Seu pedido foi realizado com sucesso”
+
+Exemplo:
+| numero_cartao 	| nome_titular 		| data_vencimento 	| cod_seguranca     |
+| 5172665886301291	| Carlos Augusto 	| 10/10/1990 		| 597 		    |
+| 5101354100476835	| Marta Roberta 	| 10/05/1987 		| 897 		    |
+
+
+
+Realizar_compra.steps
+
+@FindBy (id = "debito")
+protected WebElement debito;
+
+@FindBy (xpath= "//input[@name=’numero’]")
+protected WebElement numero;
+
+@FindBy (xpath= "//input[@name=’titular’]")
+protected WebElement titular;
+
+@FindBy (xpath= "//input[@name=’dataVencimento’]")
+protected WebElement data_vencimento;
+
+@FindBy (xpath= "//input[@name=’codSeguranca’]")
+protected WebElement cod_seguranca;
+
+@FindBy (xpath = "//a[@class = ‘Finalizar compra’]/button”)
+protected WebElement finalizar_compra;
+
+@FindBy (xpath = "//span[contains(text(),'Seu pedido foi realizado com sucesso')]”)
+protected WebElement mensagem_sucesso;
+
+
+
+@Dado(“que seleciono a opção Debito$”)
+Public void queSelecionoAOpcao() throws Exception {
+
+  System.setProperty("webdriver.chrome.driver", "C:\\drivers\\chromedriver\\chromedriver.exe");
+  driver = (WebElement) new ChromeDriver();
+  ((WebDriver) driver).manage().window().maximize();
+  ((WebDriver) driver).get("http://www.aplicacao.com.br/exemplo/");
+  driver.findElement(By.id("debito")).click();
+  
+}
+
+
+@E (“informo os dados do cartao({string} {string} {string} {string}”)
+Public informoOsDadosDoCartao(String numero_cartao, String nome_titular, String data_vencimento, String cod_seguranca) {
+
+  driver.findElement(By.xpath("//input[@name=’numero’]")).sendKeys(numero_cartao);
+  driver.findElement(By.xpath("//input[@name=’titular’]")).sendKeys(nome_titular);
+  driver.findElement(By.xpath("//input[@name=’dataVencimento’]")).sendKeys(data_vencimento);
+  driver.findElement(By.xpath("//input[@name=’codSeguranca’]")).sendKeys(cod_seguranca);
+
+}
+
+
+@Quando (“clicar em Finalizar Compra”$”)
+Public void clicarEm(String realizar_pedido) throws Exception {
+
+  driver.findElement(By.xpath("//a[@class = ‘Finalizar compra’]/button")).click();
+
+}
+
+
+@Entao (o sistema informa mensagem \”(.*)\”$”)
+Public void oSistemaInformaMensagem(String mensagem) throws Exception {
+
+  WebElement element = driver.findElement(By.xpath("//span[contains(text(),'Seu pedido foi realizado com sucesso')]"));
+  String strng = element.getText();
+  System.out.println("O texto exibido é: " + strng);
+  Assert.assertEquals("Seu pedido foi realizado com sucesso", strng);
+  //Assert.assertEquals("Seu pedido foi realizado com sucesso", mensagem_sucesso.driver.findElement(By.xpath("//span[contains(text(),'Seu pedido foi realizado com sucesso')]")).getText());
+
+}
